@@ -10,6 +10,14 @@ const schema = buildSchema(`
         stores: [Store]
     }
 
+    enum SoldOutStatus {
+        AVAILABLE
+        DISCONTINUED
+        LIMITED
+        ON_SALE
+        SOLD_OUT
+    }
+
     type Store {
         id: ID
         name: String
