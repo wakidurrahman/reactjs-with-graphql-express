@@ -20,7 +20,8 @@
       "@/graphql/*": ["src/graphql/*"],
       "@/hooks/*": ["src/hooks/*"],
       "@/utils/*": ["src/utils/*"],
-      "@/apollo/*": ["src/apollo/*"]
+      "@/apollo/*": ["src/apollo/*"],
+      "@/pages/*": ["src/pages/*"]
     }
   },
   "include": ["src"],

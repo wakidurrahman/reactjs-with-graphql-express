@@ -2,7 +2,7 @@ import { useAuthContext } from '@/context/AuthContext';
 import { GET_ME, GET_MEETINGS } from '@/graphql/queries';
 import { useQuery } from '@apollo/client';
 import React from 'react';
-import BaseTemplate from '../templates/base-templates';
+import BaseTemplate from '../components/templates/base-templates';
 
 export default function Dashboard(): JSX.Element {
   const { logout } = useAuthContext();

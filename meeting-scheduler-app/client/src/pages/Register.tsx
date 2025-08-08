@@ -1,5 +1,5 @@
 import { useAuthContext } from '@/context/AuthContext';
-import { LOGIN } from '@/graphql/mutations';
+import { REGISTER } from '@/graphql/mutations';
 import { useMutation } from '@apollo/client';
 import { DevTool } from '@hookform/devtools';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -7,13 +7,14 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
-import BaseTemplate from '../templates/base-templates';
+import BaseTemplate from '../components/templates/base-templates';
 
-export default function Login(): JSX.Element {
+export default function Register(): JSX.Element {
   const navigate = useNavigate();
   const { login: setAuth } = useAuthContext();
 
   const schema = z.object({
+    name: z.string().min(2, 'Name is too short'),
     email: z.string().email('Invalid email'),
     password: z.string().min(6, 'Password must be at least 6 characters'),
   });
@@ -31,16 +32,16 @@ export default function Login(): JSX.Element {
     criteriaMode: 'all',
     shouldFocusError: true,
   });
-  const [loginMutation, { loading, error }] = useMutation(LOGIN, {
+  const [registerMutation, { loading, error }] = useMutation(REGISTER, {
     onCompleted: (data) => {
-      const { token, user } = data.login;
+      const { token, user } = data.register;
       setAuth(token, user);
       navigate('/');
     },
   });
 
   const onSubmit = (values: FormValues) => {
-    loginMutation({ variables: values });
+    registerMutation({ variables: values });
   };
 
   return (
@@ -48,8 +49,15 @@ export default function Login(): JSX.Element {
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-md-6">
-            <h2 className="mb-3">Login</h2>
+            <h2 className="mb-3">Register</h2>
             <form onSubmit={handleSubmit(onSubmit)} noValidate>
+              <div className="mb-3">
+                <label className="form-label">Name</label>
+                <input className="form-control" {...register('name')} />
+                {errors.name && (
+                  <div className="text-danger small">{errors.name.message}</div>
+                )}
+              </div>
               <div className="mb-3">
                 <label className="form-label">Email</label>
                 <input
@@ -84,7 +92,7 @@ export default function Login(): JSX.Element {
                 type="submit"
                 disabled={loading || isSubmitting}
               >
-                Login
+                Create account
               </button>
             </form>
             {process.env.NODE_ENV !== 'production' && (
