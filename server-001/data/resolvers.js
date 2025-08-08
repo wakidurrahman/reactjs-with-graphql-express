@@ -1,20 +1,17 @@
-import crypto from 'crypto';
 import { Widgets } from './db-connectors.js';
 
-class Product {
-  constructor(id, { name, description, price, soldOut, stores }) {
-    this.id = id;
-    this.name = name;
-    this.description = description;
-    this.price = price;
-    this.soldOut = soldOut;
-    this.stores = stores;
-  }
-}
-
-const productDatabase = {};
-
 const resolvers = {
+  // Get all products
+  getAllProducts: async () => {
+    try {
+      const products = await Widgets.find();
+      return products;
+    } catch (error) {
+      throw new Error(error);
+    }
+  },
+
+  // Get a single product
   getProduct: async ({ id }) => {
     try {
       const product = await Widgets.findById(id);
@@ -23,6 +20,8 @@ const resolvers = {
       throw new Error(error);
     }
   },
+
+  // Create a new product
   createProduct: async ({ input }) => {
     const savedProduct = new Widgets({
       name: input.name,
@@ -41,6 +40,8 @@ const resolvers = {
       throw new Error(error);
     }
   },
+
+  // Update a product
   updateProduct: async ({ input }) => {
     try {
       const updatedProduct = await Widgets.findOneAndUpdate(
@@ -53,10 +54,12 @@ const resolvers = {
       throw new Error(error);
     }
   },
+
+  // Delete a product
   deleteProduct: async ({ id }) => {
     try {
-      const deletedProduct = await Widgets.deleteOne({ _id: id });
-      return deletedProduct;
+      await Widgets.deleteOne({ _id: id });
+      return 'Successfully deleted product';
     } catch (error) {
       throw new Error(error);
     }
