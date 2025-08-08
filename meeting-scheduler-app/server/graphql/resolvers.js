@@ -16,28 +16,29 @@ function requireAuth(context) {
 
 module.exports = {
   // Query resolvers
-  me: async (_root, _args, context) => {
+  me: async (_args, context) => {
     const userId = requireAuth(context);
     const user = await User.findById(userId);
     return user;
   },
-  meetings: async (_root, _args, context) => {
+  meetings: async (_args, context) => {
     const userId = requireAuth(context);
     return Meeting.find({ $or: [{ createdBy: userId }, { attendees: userId }] })
       .sort({ startTime: 1 })
       .populate('attendees')
       .populate('createdBy');
   },
-  meeting: async (_root, { id }, context) => {
+  meeting: async ({ id }, context) => {
     requireAuth(context);
     return Meeting.findById(id).populate('attendees').populate('createdBy');
   },
 
   // Mutation resolvers
-  register: async (_root, { name, email, password }) => {
-    RegisterInputSchema.parse({ name, email, password });
-    const existing = await User.findOne({ email });
-    if (existing) throw new Error('Email already in use');
+  register: async ({ name, email, password }) => {
+    // RegisterInputSchema.parse({ name, email, password });
+    // const existing = await User.findOne({ email });
+    // if (existing) throw new Error('Email already in use');
+    console.log('register', name, email, password);
     const hashed = await bcrypt.hash(password, 10);
     const user = await User.create({ name, email, password: hashed });
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
@@ -45,7 +46,7 @@ module.exports = {
     });
     return { token, user };
   },
-  login: async (_root, { email, password }) => {
+  login: async ({ email, password }) => {
     LoginInputSchema.parse({ email, password });
     const user = await User.findOne({ email });
     if (!user) throw new Error('Invalid credentials');
@@ -56,7 +57,7 @@ module.exports = {
     });
     return { token, user };
   },
-  createMeeting: async (_root, { input }, context) => {
+  createMeeting: async ({ input }, context) => {
     const userId = requireAuth(context);
     const { title, description, startTime, endTime, attendeeIds } =
       MeetingInputSchema.parse(input);
@@ -72,7 +73,7 @@ module.exports = {
     await meeting.populate('createdBy');
     return meeting;
   },
-  deleteMeeting: async (_root, { id }, context) => {
+  deleteMeeting: async ({ id }, context) => {
     const userId = requireAuth(context);
     const meeting = await Meeting.findById(id);
     if (!meeting) return false;

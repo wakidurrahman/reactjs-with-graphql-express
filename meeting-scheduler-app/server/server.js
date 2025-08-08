@@ -43,6 +43,8 @@ async function start() {
       context: { req },
       graphiql: process.env.NODE_ENV !== 'production',
       customFormatErrorFn: (err) => {
+        console.log('err', err);
+        console.log('req', req.body);
         const isZod =
           err.originalError && err.originalError.name === 'ZodError';
         const code = isZod ? 'BAD_USER_INPUT' : 'INTERNAL_SERVER_ERROR';
