@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { Widgets } from './db-connectors.js';
 
 class Product {
   constructor(id, { name, description, price, soldOut, stores }) {
@@ -14,13 +15,51 @@ class Product {
 const productDatabase = {};
 
 const resolvers = {
-  getProduct: ({ id }) => {
-    return new Product(id, productDatabase[id]);
+  getProduct: async ({ id }) => {
+    try {
+      const product = await Widgets.findById(id);
+      return product;
+    } catch (error) {
+      throw new Error(error);
+    }
   },
-  createProduct: ({ input }) => {
-    let id = crypto.randomBytes(10).toString('hex');
-    productDatabase[id] = input;
-    return new Product(id, input);
+  createProduct: async ({ input }) => {
+    const savedProduct = new Widgets({
+      name: input.name,
+      description: input.description,
+      price: input.price,
+      soldOut: input.soldOut,
+      inventory: input.inventory,
+      stores: input.stores,
+    });
+
+    savedProduct.id = savedProduct._id; // Convert _id to id
+    try {
+      await savedProduct.save();
+      return savedProduct;
+    } catch (error) {
+      throw new Error(error);
+    }
+  },
+  updateProduct: async ({ input }) => {
+    try {
+      const updatedProduct = await Widgets.findOneAndUpdate(
+        { _id: input.id },
+        input,
+        { new: true }
+      );
+      return updatedProduct;
+    } catch (error) {
+      throw new Error(error);
+    }
+  },
+  deleteProduct: async ({ id }) => {
+    try {
+      const deletedProduct = await Widgets.deleteOne({ _id: id });
+      return deletedProduct;
+    } catch (error) {
+      throw new Error(error);
+    }
   },
 };
 

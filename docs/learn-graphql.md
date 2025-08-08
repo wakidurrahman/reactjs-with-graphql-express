@@ -42,6 +42,29 @@ const schema = buildSchema(`
 `;
 ```
 
+### GraphQL Mutation
+
+```graphql
+mutation {
+  createProduct(
+    input: {
+      name: "Widget 01"
+      description: "Another Widget for your garden"
+      price: 300
+      soldOut: AVAILABLE
+      stores: [{ name: "store 1", address: "123 Main st" }]
+    }
+  ) {
+    price
+    name
+    description
+    stores {
+      name
+    }
+  }
+}
+```
+
 ### GraphQL resolvers
 
 Resolver will actually resolve the results from each API endpoint. So the type definition provides what type of data we expect and the resolvers gets the data for us.

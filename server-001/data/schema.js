@@ -4,9 +4,10 @@ const schema = buildSchema(`
     type Product {
         id: ID
         name: String
-        price: Float
         description: String
-        soldOut: Boolean
+        price: Float
+        soldOut: SoldOutStatus
+        inventory: Int
         stores: [Store]
     }
 
@@ -39,12 +40,15 @@ const schema = buildSchema(`
         name: String
         price: Float
         description: String
-        soldOut: Boolean
+        soldOut: SoldOutStatus
+        inventory: Int
         stores: [StoreInput]!
     }
 
     type Mutation {
         createProduct(input: ProductInput): Product
+        updateProduct(input: ProductInput): Product
+        deleteProduct(id: ID!): Product
     }
 `);
 
