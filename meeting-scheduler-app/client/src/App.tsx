@@ -1,7 +1,8 @@
 import { useAuthContext } from '@/context/AuthContext';
-import Dashboard from '@/pages/Dashboard';
-import Login from '@/pages/Login';
-import Register from '@/pages/Register';
+import CreateMeeting from '@/pages/create-meeting';
+import Dashboard from '@/pages/dashboard';
+import Login from '@/pages/login';
+import Register from '@/pages/register';
 import React from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
@@ -28,6 +29,14 @@ export default function App(): JSX.Element {
         element={
           <PrivateRoute>
             <Dashboard />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/meetings/new"
+        element={
+          <PrivateRoute>
+            <CreateMeeting />
           </PrivateRoute>
         }
       />

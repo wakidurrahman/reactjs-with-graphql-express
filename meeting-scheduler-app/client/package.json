@@ -12,13 +12,14 @@
     "@apollo/client": "3.3.11",
     "bootstrap": "5.3.3",
     "graphql": "^15.9.0",
-    "react-hook-form": "^7.52.1",
-    "zod": "^3.23.8",
     "react": "16.13.1",
     "react-dom": "16.13.1",
-    "react-router-dom": "^6.23.0"
+    "react-hook-form": "^7.52.1",
+    "react-router-dom": "^6.23.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@graphql-typed-document-node/core": "^3.2.0",
     "@hookform/devtools": "^4.3.1",
     "@hookform/resolvers": "^3.9.0",
     "@types/node": "^20.14.10",

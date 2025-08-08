@@ -13,7 +13,7 @@ Monorepo containing a React (Vite + TS) client and an Express + GraphQL + Mongoo
   - SCSS (Bootstrap 5 via SCSS with custom variables)
   - React Hook Form + Zod
 - Server:
-  - Express
+  - Express (For)
   - express-graphql
   - Mongoose
   - JWT
@@ -58,7 +58,6 @@ Monorepo containing a React (Vite + TS) client and an Express + GraphQL + Mongoo
 ├── vite.config.ts
 ├── .env
 ├── .env.example
-├── .gitignore
 ├── .prettierrc
 ├── .prettierignore
 ├── .eslintrc.json
@@ -81,7 +80,6 @@ Monorepo containing a React (Vite + TS) client and an Express + GraphQL + Mongoo
 └── package.json
 ├── .env
 ├── .env.example
-├── .gitignore
 ├── .prettierrc
 ├── .prettierignore
 ├── .eslintrc.json

@@ -1,6 +1,22 @@
 import { gql } from '@apollo/client';
+import { TypedDocumentNode as TD } from '@graphql-typed-document-node/core';
 
-export const GET_ME = gql`
+/**
+ * Get the current user
+ * @returns {Object} The current user
+ */
+// Types for Me query
+export interface MeQueryData {
+  me: {
+    id: string;
+    name: string;
+    email: string;
+  } | null;
+}
+
+export type MeQueryVariables = Record<string, never>;
+
+export const GET_ME: TD<MeQueryData, MeQueryVariables> = gql`
   query Me {
     me {
       id
@@ -8,9 +24,28 @@ export const GET_ME = gql`
       email
     }
   }
-`;
+` as unknown as TD<MeQueryData, MeQueryVariables>;
 
-export const GET_MEETINGS = gql`
+/**
+ * Get the meetings
+ * @returns {Object} The meetings
+ */
+// Types for Meetings query
+export interface MeetingsQueryData {
+  meetings: Array<{
+    id: string;
+    title: string;
+    description: string | null;
+    startTime: string;
+    endTime: string;
+    createdAt: string;
+    updatedAt: string;
+  }>;
+}
+
+export type MeetingsQueryVariables = Record<string, never>;
+
+export const GET_MEETINGS: TD<MeetingsQueryData, MeetingsQueryVariables> = gql`
   query Meetings {
     meetings {
       id
@@ -22,4 +57,4 @@ export const GET_MEETINGS = gql`
       updatedAt
     }
   }
-`;
+` as unknown as TD<MeetingsQueryData, MeetingsQueryVariables>;

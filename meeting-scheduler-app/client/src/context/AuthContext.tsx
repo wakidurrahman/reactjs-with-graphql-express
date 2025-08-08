@@ -6,20 +6,18 @@ import React, {
   useState,
 } from 'react';
 
-type AuthUser = { id: string; name: string; email: string } | null;
+export type AuthenticatedUser = { id: string; name: string; email: string };
+export type AuthUser = AuthenticatedUser | null;
 
 type AuthContextValue = {
   user: AuthUser;
   token: string | null;
   isAuthenticated: boolean;
-  login: (
-    token: string,
-    user: { id: string; name: string; email: string }
-  ) => void;
+  login: (token: string, user: AuthenticatedUser) => void;
   logout: () => void;
 };
 
-const AuthContext = createContext<AuthContextValue | undefined>(undefined);
+const AuthContext = createContext<AuthContextValue | null>(null);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -63,4 +61,17 @@ export const useAuthContext = (): AuthContextValue => {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error('useAuthContext must be used within AuthProvider');
   return ctx;
+};
+
+// Typed helpers for non-null access
+export const useAuthUser = (): AuthenticatedUser => {
+  const { user } = useAuthContext();
+  if (!user) throw new Error('useAuthUser requires an authenticated user');
+  return user;
+};
+
+export const useAuthToken = (): string => {
+  const { token } = useAuthContext();
+  if (!token) throw new Error('useAuthToken requires an authenticated token');
+  return token;
 };
