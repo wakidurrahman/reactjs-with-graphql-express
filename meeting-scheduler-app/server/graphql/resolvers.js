@@ -19,7 +19,7 @@ function requireAuth(context) {
 }
 
 module.exports = {
-  // Query resolvers
+  // Query resolvers (buildSchema root resolvers: (args, context))
   me: async (_args, context) => {
     const userId = requireAuth(context);
     const user = await User.findById(userId);
@@ -38,7 +38,7 @@ module.exports = {
   },
 
   // Mutation resolvers
-  register: async (_root, { name, email, password }) => {
+  register: async ({ name, email, password }, context) => {
     RegisterInputSchema.parse({ name, email, password });
     const existing = await User.findOne({ email });
     if (existing)
@@ -46,8 +46,6 @@ module.exports = {
         extensions: { code: 'BAD_USER_INPUT' },
       });
     const hashed = await bcrypt.hash(password, 10);
-    console.log('hashed', hashed);
-    console.log('user', user);
     const user = await User.create({ name, email, password: hashed });
     if (!process.env.JWT_SECRET) {
       throw new GraphQLError('Server misconfiguration: JWT secret missing', {
@@ -59,7 +57,7 @@ module.exports = {
     });
     return { token, user };
   },
-  login: async ({ email, password }) => {
+  login: async ({ email, password }, context) => {
     LoginInputSchema.parse({ email, password });
     const user = await User.findOne({ email });
     if (!user)

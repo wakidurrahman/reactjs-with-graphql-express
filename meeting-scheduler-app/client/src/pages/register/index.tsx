@@ -1,10 +1,7 @@
 import BaseTemplate from '@/components/templates/base-templates';
 import { useAuthContext } from '@/context/AuthContext';
-import {
-  REGISTER,
-  type RegisterMutationData,
-  type RegisterMutationVariables,
-} from '@/graphql/mutations';
+import { REGISTER, type RegisterMutationData } from '@/graphql/mutations';
+import type { UserRegisterInput } from '@/types/user';
 import { useMutation } from '@apollo/client';
 import { DevTool } from '@hookform/devtools';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -38,7 +35,7 @@ export default function Register(): JSX.Element {
   });
   const [registerMutation, { loading, error }] = useMutation<
     RegisterMutationData,
-    RegisterMutationVariables
+    UserRegisterInput
   >(REGISTER, {
     onCompleted: (data) => {
       const { token, user } = data.register;

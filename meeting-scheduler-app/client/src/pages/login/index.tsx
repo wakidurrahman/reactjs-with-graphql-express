@@ -1,10 +1,7 @@
 import BaseTemplate from '@/components/templates/base-templates';
 import { useAuthContext } from '@/context/AuthContext';
-import {
-  LOGIN,
-  type LoginMutationData,
-  type LoginMutationVariables,
-} from '@/graphql/mutations';
+import { LOGIN, type LoginMutationData } from '@/graphql/mutations';
+import type { UserLoginInput } from '@/types/user';
 import { useMutation } from '@apollo/client';
 import { DevTool } from '@hookform/devtools';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -37,7 +34,7 @@ export default function Login(): JSX.Element {
   });
   const [loginMutation, { loading, error }] = useMutation<
     LoginMutationData,
-    LoginMutationVariables
+    UserLoginInput
   >(LOGIN, {
     onCompleted: (data) => {
       const { token, user } = data.login;
