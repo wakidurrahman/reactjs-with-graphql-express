@@ -39,10 +39,14 @@ Monorepo containing a React (Vite + TS) client and an Express + GraphQL + Mongoo
 │   │   ├── atoms/
 │   │   ├── molecules/
 │   │   ├── organisms/
-│   │   └── pages/
 │   ├── graphql/
 │   │   ├── mutations.ts
 │   │   └── queries.ts
+│   ├── pages/
+│   │   ├── create-meeting
+│   │   ├── dashboard
+│   │   ├── login
+│   │   └── register
 │   ├── hooks/
 │   ├── context/
 │   │   └── AuthContext.tsx
