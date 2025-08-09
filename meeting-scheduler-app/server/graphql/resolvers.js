@@ -20,19 +20,19 @@ function requireAuth(context) {
 
 module.exports = {
   // Query resolvers
-  me: async (_root, _args, context) => {
+  me: async (_args, context) => {
     const userId = requireAuth(context);
     const user = await User.findById(userId);
     return user;
   },
-  meetings: async (_root, _args, context) => {
+  meetings: async (_args, context) => {
     const userId = requireAuth(context);
     return Meeting.find({ $or: [{ createdBy: userId }, { attendees: userId }] })
       .sort({ startTime: 1 })
       .populate('attendees')
       .populate('createdBy');
   },
-  meeting: async (_root, { id }, context) => {
+  meeting: async ({ id }, context) => {
     requireAuth(context);
     return Meeting.findById(id).populate('attendees').populate('createdBy');
   },
@@ -59,7 +59,7 @@ module.exports = {
     });
     return { token, user };
   },
-  login: async (_root, { email, password }) => {
+  login: async ({ email, password }) => {
     LoginInputSchema.parse({ email, password });
     const user = await User.findOne({ email });
     if (!user)
@@ -81,7 +81,7 @@ module.exports = {
     });
     return { token, user };
   },
-  createMeeting: async (_root, { input }, context) => {
+  createMeeting: async ({ input }, context) => {
     const userId = requireAuth(context);
     const { title, description, startTime, endTime, attendeeIds } =
       MeetingInputSchema.parse(input);
@@ -97,7 +97,7 @@ module.exports = {
     await meeting.populate('createdBy');
     return meeting;
   },
-  deleteMeeting: async (_root, { id }, context) => {
+  deleteMeeting: async ({ id }, context) => {
     const userId = requireAuth(context);
     const meeting = await Meeting.findById(id);
     if (!meeting) return false;
