@@ -10,6 +10,7 @@ export default defineConfig({
     },
   },
   server: {
+    // this is the server configuration for the client proxy.
     port: 5173,
     open: true,
     proxy: {
