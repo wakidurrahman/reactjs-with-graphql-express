@@ -108,14 +108,14 @@ NODE_ENV=development
 
 ```bash
 cd client && npm install
-cd ../server && npm install
+cd server && npm install
 ```
 
 1. Start apps
 
 ```bash
 cd server && npm run dev
-cd ../client && npm run dev
+cd client && npm run dev
 ```
 
 The client proxies `/graphql` to `http://localhost:4000` during development.
