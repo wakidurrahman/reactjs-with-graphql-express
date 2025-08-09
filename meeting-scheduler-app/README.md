@@ -25,7 +25,7 @@ Monorepo containing a React (Vite + TS) client and an Express + GraphQL + Mongoo
 
 ## Project structure
 
-```
+```text
 /client
 ├── public/
 ├── src/
@@ -100,16 +100,16 @@ CLIENT_ORIGIN=http://localhost:5173
 NODE_ENV=development
 ```
 
-2. Install dependencies
+1. Install dependencies
 
-```
+```bash
 cd client && npm install
 cd ../server && npm install
 ```
 
-3. Start apps
+1. Start apps
 
-```
+```bash
 cd server && npm run dev
 cd ../client && npm run dev
 ```
