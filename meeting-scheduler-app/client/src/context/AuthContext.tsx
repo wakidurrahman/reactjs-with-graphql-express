@@ -6,45 +6,38 @@ import React, {
   useState,
 } from 'react';
 
-export type AuthenticatedUser = { id: string; name: string; email: string };
-export type AuthUser = AuthenticatedUser | null;
-
-type AuthContextValue = {
-  user: AuthUser;
-  token: string | null;
-  isAuthenticated: boolean;
-  login: (token: string, user: AuthenticatedUser) => void;
-  logout: () => void;
-};
+import { AuthContextValue, AuthUser, AuthenticatedUser } from '@/types/user';
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+interface AuthProviderProps {
+  children: React.ReactNode;
+}
+
+export const TOKEN_KEY = 'MS_TOKEN';
+export const USER_KEY = 'MS_USER';
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<AuthUser>(null);
 
   useEffect(() => {
-    const storedToken = localStorage.getItem('ms_token');
-    const storedUser = localStorage.getItem('ms_user');
+    const storedToken = localStorage.getItem(TOKEN_KEY);
+    const storedUser = localStorage.getItem(USER_KEY);
     if (storedToken) setToken(storedToken);
     if (storedUser) setUser(JSON.parse(storedUser));
   }, []);
 
-  const login = (
-    newToken: string,
-    newUser: { id: string; name: string; email: string }
-  ) => {
-    localStorage.setItem('ms_token', newToken);
-    localStorage.setItem('ms_user', JSON.stringify(newUser));
+  const login = (newToken: string, newUser: AuthenticatedUser) => {
+    localStorage.setItem(TOKEN_KEY, newToken);
+    localStorage.setItem(USER_KEY, JSON.stringify(newUser));
     setToken(newToken);
     setUser(newUser);
   };
 
   const logout = () => {
-    localStorage.removeItem('ms_token');
-    localStorage.removeItem('ms_user');
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
     setToken(null);
     setUser(null);
   };
@@ -58,9 +51,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 };
 
 export const useAuthContext = (): AuthContextValue => {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuthContext must be used within AuthProvider');
-  return ctx;
+  const context = useContext(AuthContext);
+  if (!context)
+    throw new Error('useAuthContext must be used within AuthProvider');
+  return context;
 };
 
 // Typed helpers for non-null access

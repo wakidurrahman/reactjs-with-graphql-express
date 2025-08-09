@@ -1,3 +1,5 @@
+import { Meeting, MeetingInput } from '@/types/meeting';
+import { User, UserLoginInput, UserRegisterInput } from '@/types/user';
 import { gql } from '@apollo/client';
 import { TypedDocumentNode as TD } from '@graphql-typed-document-node/core';
 
@@ -5,52 +7,32 @@ import { TypedDocumentNode as TD } from '@graphql-typed-document-node/core';
 export interface RegisterMutationData {
   register: {
     token: string;
-    user: {
-      id: string;
-      name: string;
-      email: string;
-    };
+    user: User;
   };
 }
 
-export interface RegisterMutationVariables {
-  name: string;
-  email: string;
-  password: string;
-}
-
-export const REGISTER: TD<RegisterMutationData, RegisterMutationVariables> =
-  gql`
-    mutation Register($name: String!, $email: String!, $password: String!) {
-      register(name: $name, email: $email, password: $password) {
-        token
-        user {
-          id
-          name
-          email
-        }
+export const REGISTER: TD<RegisterMutationData, UserRegisterInput> = gql`
+  mutation Register($name: String!, $email: String!, $password: String!) {
+    register(name: $name, email: $email, password: $password) {
+      token
+      user {
+        id
+        name
+        email
       }
     }
-  ` as unknown as TD<RegisterMutationData, RegisterMutationVariables>;
+  }
+` as unknown as TD<RegisterMutationData, UserRegisterInput>;
 
 // Types for Login mutation
 export interface LoginMutationData {
   login: {
     token: string;
-    user: {
-      id: string;
-      name: string;
-      email: string;
-    };
+    user: User;
   };
 }
 
-export interface LoginMutationVariables {
-  email: string;
-  password: string;
-}
-
-export const LOGIN: TD<LoginMutationData, LoginMutationVariables> = gql`
+export const LOGIN: TD<LoginMutationData, UserLoginInput> = gql`
   mutation Login($email: String!, $password: String!) {
     login(email: $email, password: $password) {
       token
@@ -61,27 +43,15 @@ export const LOGIN: TD<LoginMutationData, LoginMutationVariables> = gql`
       }
     }
   }
-` as unknown as TD<LoginMutationData, LoginMutationVariables>;
+` as unknown as TD<LoginMutationData, UserLoginInput>;
 
 // Types for CreateMeeting mutation
 export interface CreateMeetingMutationData {
-  createMeeting: {
-    id: string;
-    title: string;
-    description: string | null;
-    startTime: string;
-    endTime: string;
-  };
+  createMeeting: Meeting;
 }
 
 export interface CreateMeetingMutationVariables {
-  input: {
-    title: string;
-    description?: string | null;
-    startTime: string;
-    endTime: string;
-    attendeeIds: string[];
-  };
+  input: MeetingInput;
 }
 
 export const CREATE_MEETING: TD<

@@ -1,3 +1,5 @@
+import { Meetings } from '@/types/meeting';
+import { User } from '@/types/user';
 import { gql } from '@apollo/client';
 import { TypedDocumentNode as TD } from '@graphql-typed-document-node/core';
 
@@ -7,16 +9,10 @@ import { TypedDocumentNode as TD } from '@graphql-typed-document-node/core';
  */
 // Types for Me query
 export interface MeQueryData {
-  me: {
-    id: string;
-    name: string;
-    email: string;
-  } | null;
+  me: User | null;
 }
 
-export type MeQueryVariables = Record<string, never>;
-
-export const GET_ME: TD<MeQueryData, MeQueryVariables> = gql`
+export const GET_ME: TD<MeQueryData, Record<string, never>> = gql`
   query Me {
     me {
       id
@@ -24,7 +20,7 @@ export const GET_ME: TD<MeQueryData, MeQueryVariables> = gql`
       email
     }
   }
-` as unknown as TD<MeQueryData, MeQueryVariables>;
+` as unknown as TD<MeQueryData, Record<string, never>>;
 
 /**
  * Get the meetings
@@ -32,20 +28,10 @@ export const GET_ME: TD<MeQueryData, MeQueryVariables> = gql`
  */
 // Types for Meetings query
 export interface MeetingsQueryData {
-  meetings: Array<{
-    id: string;
-    title: string;
-    description: string | null;
-    startTime: string;
-    endTime: string;
-    createdAt: string;
-    updatedAt: string;
-  }>;
+  meetings: Array<Meetings>;
 }
 
-export type MeetingsQueryVariables = Record<string, never>;
-
-export const GET_MEETINGS: TD<MeetingsQueryData, MeetingsQueryVariables> = gql`
+export const GET_MEETINGS: TD<MeetingsQueryData, Record<string, never>> = gql`
   query Meetings {
     meetings {
       id
@@ -57,4 +43,4 @@ export const GET_MEETINGS: TD<MeetingsQueryData, MeetingsQueryVariables> = gql`
       updatedAt
     }
   }
-` as unknown as TD<MeetingsQueryData, MeetingsQueryVariables>;
+` as unknown as TD<MeetingsQueryData, Record<string, never>>;

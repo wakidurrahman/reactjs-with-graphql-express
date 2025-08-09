@@ -21,7 +21,8 @@
       "@/hooks/*": ["src/hooks/*"],
       "@/utils/*": ["src/utils/*"],
       "@/apollo/*": ["src/apollo/*"],
-      "@/pages/*": ["src/pages/*"]
+      "@/pages/*": ["src/pages/*"],
+      "@/types/*": ["src/types/*"]
     }
   },
   "include": ["src"],
