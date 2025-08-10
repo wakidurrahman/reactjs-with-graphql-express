@@ -1,12 +1,10 @@
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import React, { createContext, useContext, useMemo, useState } from 'react';
 
-import { AuthContextValue, AuthUser, AuthenticatedUser } from '@/types/user';
+import {
+  AuthContextValue,
+  AuthUserNullable,
+  AuthenticatedUser,
+} from '@/types/user';
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
@@ -18,15 +16,21 @@ export const TOKEN_KEY = 'MS_TOKEN';
 export const USER_KEY = 'MS_USER';
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [token, setToken] = useState<string | null>(null);
-  const [user, setUser] = useState<AuthUser>(null);
-
-  useEffect(() => {
-    const storedToken = localStorage.getItem(TOKEN_KEY);
-    const storedUser = localStorage.getItem(USER_KEY);
-    if (storedToken) setToken(storedToken);
-    if (storedUser) setUser(JSON.parse(storedUser));
-  }, []);
+  const [token, setToken] = useState<string | null>(() => {
+    try {
+      return localStorage.getItem(TOKEN_KEY);
+    } catch {
+      return null;
+    }
+  });
+  const [user, setUser] = useState<AuthUserNullable>(() => {
+    try {
+      const raw = localStorage.getItem(USER_KEY);
+      return raw ? (JSON.parse(raw) as AuthUserNullable) : null;
+    } catch {
+      return null;
+    }
+  });
 
   const login = (newToken: string, newUser: AuthenticatedUser) => {
     localStorage.setItem(TOKEN_KEY, newToken);

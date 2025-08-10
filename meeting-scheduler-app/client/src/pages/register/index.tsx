@@ -1,7 +1,6 @@
 import Button from '@/components/atoms/button';
 import TextField from '@/components/atoms/text-field';
 import BaseTemplate from '@/components/templates/base-templates';
-import { useAuthContext } from '@/context/AuthContext';
 import { REGISTER, type RegisterMutationData } from '@/graphql/mutations';
 import type { UserRegisterInput } from '@/types/user';
 import { useMutation } from '@apollo/client';
@@ -14,7 +13,6 @@ import { z } from 'zod';
 
 export default function Register(): JSX.Element {
   const navigate = useNavigate();
-  const { login: setAuth } = useAuthContext();
 
   const schema = z.object({
     name: z.string().min(2, 'Name is too short'),
@@ -37,17 +35,15 @@ export default function Register(): JSX.Element {
   });
   const [registerMutation, { loading, error }] = useMutation<
     RegisterMutationData,
-    UserRegisterInput
+    { input: UserRegisterInput }
   >(REGISTER, {
-    onCompleted: (data) => {
-      const { token, user } = data.register;
-      setAuth(token, user);
-      navigate('/');
+    onCompleted: () => {
+      navigate('/login');
     },
   });
 
   const onSubmit = (values: FormValues) => {
-    registerMutation({ variables: values });
+    registerMutation({ variables: { input: values } });
   };
 
   return (

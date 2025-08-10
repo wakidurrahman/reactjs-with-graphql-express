@@ -38,8 +38,19 @@ const MeetingInputSchema = z
     path: ['endTime'],
   });
 
+const UpdateProfileInputSchema = z.object({
+  name: z.string().min(2).optional(),
+  address: z.string().optional(),
+  dob: z
+    .string()
+    .refine((val) => !val || !Number.isNaN(Date.parse(val)), 'Invalid dob')
+    .optional(),
+  imageUrl: z.string().url().optional(),
+});
+
 module.exports = {
   RegisterInputSchema,
   LoginInputSchema,
   MeetingInputSchema,
+  UpdateProfileInputSchema,
 };

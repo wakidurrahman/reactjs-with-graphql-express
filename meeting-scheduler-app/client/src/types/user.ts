@@ -1,7 +1,20 @@
-export type User = {
+export type AuthUser = {
   id: string;
   name: string;
   email: string;
+  imageUrl?: string | null;
+};
+
+export type UserProfile = {
+  id: string;
+  name: string;
+  email: string;
+  imageUrl?: string | null;
+  address?: string | null;
+  dob?: string | null; // ISO string
+  role: 'USER' | 'ADMIN';
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type UserRegisterInput = {
@@ -10,11 +23,11 @@ export type UserRegisterInput = {
   password: string;
 };
 
-export type AuthenticatedUser = User;
-export type AuthUser = AuthenticatedUser | null;
+export type AuthenticatedUser = AuthUser;
+export type AuthUserNullable = AuthenticatedUser | null;
 
 export type AuthContextValue = {
-  user: AuthUser; // the authenticated user
+  user: AuthUserNullable; // the authenticated user
   token: string | null;
   isAuthenticated: boolean;
   login: (token: string, user: AuthenticatedUser) => void;

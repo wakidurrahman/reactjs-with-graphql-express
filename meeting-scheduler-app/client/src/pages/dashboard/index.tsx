@@ -1,4 +1,3 @@
-import Button from '@/components/atoms/button';
 import Heading from '@/components/atoms/heading';
 import Spinner from '@/components/atoms/spinner';
 import BaseTemplate from '@/components/templates/base-templates';
@@ -25,17 +24,8 @@ export default function Dashboard(): JSX.Element {
   return (
     <BaseTemplate>
       <div className="container">
-        <div className="d-flex justify-content-between align-items-center mb-3">
-          <Heading level={2}>Welcome, {meData?.me?.name || 'User'}</Heading>
-          <Button variant="secondary" outline onClick={logout}>
-            Logout
-          </Button>
-        </div>
-        <div className="d-flex justify-content-end mb-2">
-          <Button variant="primary" size="sm" href="/meetings/new">
-            + New meeting
-          </Button>
-        </div>
+        <Heading level={2}>Welcome, {meData?.me?.name || 'User'}</Heading>
+
         <div className="card">
           <div className="card-body">
             <Heading level={5}>Your meetings</Heading>

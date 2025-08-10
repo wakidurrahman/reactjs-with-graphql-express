@@ -1,5 +1,5 @@
 import { Meetings } from '@/types/meeting';
-import { User } from '@/types/user';
+import { AuthUser, UserProfile } from '@/types/user';
 import { gql } from '@apollo/client';
 import { TypedDocumentNode as TD } from '@graphql-typed-document-node/core';
 
@@ -9,7 +9,7 @@ import { TypedDocumentNode as TD } from '@graphql-typed-document-node/core';
  */
 // Types for Me query
 export interface MeQueryData {
-  me: User | null;
+  me: AuthUser | null;
 }
 
 export const GET_ME: TD<MeQueryData, Record<string, never>> = gql`
@@ -18,6 +18,7 @@ export const GET_ME: TD<MeQueryData, Record<string, never>> = gql`
       id
       name
       email
+      imageUrl
     }
   }
 ` as unknown as TD<MeQueryData, Record<string, never>>;
@@ -47,7 +48,7 @@ export const GET_MEETINGS: TD<MeetingsQueryData, Record<string, never>> = gql`
 
 // Types for Users query
 export interface UsersQueryData {
-  users: Array<User>;
+  users: Array<UserProfile>;
 }
 
 export const GET_USERS: TD<UsersQueryData, Record<string, never>> = gql`
@@ -56,6 +57,33 @@ export const GET_USERS: TD<UsersQueryData, Record<string, never>> = gql`
       id
       name
       email
+      imageUrl
+      role
+      createdAt
+      updatedAt
     }
   }
 ` as unknown as TD<UsersQueryData, Record<string, never>>;
+
+// My profile
+export interface MyProfileQueryData {
+  myProfile: UserProfile | null;
+}
+export const GET_MY_PROFILE: TD<
+  MyProfileQueryData,
+  Record<string, never>
+> = gql`
+  query MyProfile {
+    myProfile {
+      id
+      name
+      email
+      imageUrl
+      address
+      dob
+      role
+      createdAt
+      updatedAt
+    }
+  }
+` as unknown as TD<MyProfileQueryData, Record<string, never>>;

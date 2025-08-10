@@ -36,7 +36,7 @@ export default function Login(): JSX.Element {
   });
   const [loginMutation, { loading, error }] = useMutation<
     LoginMutationData,
-    UserLoginInput
+    { input: UserLoginInput }
   >(LOGIN, {
     onCompleted: (data) => {
       const { token, user } = data.login;
@@ -46,7 +46,7 @@ export default function Login(): JSX.Element {
   });
 
   const onSubmit = (values: FormValues) => {
-    loginMutation({ variables: values });
+    loginMutation({ variables: { input: values } });
   };
 
   return (

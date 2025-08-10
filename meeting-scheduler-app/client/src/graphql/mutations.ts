@@ -1,49 +1,72 @@
 import { Meeting, MeetingInput } from '@/types/meeting';
-import { User, UserLoginInput, UserRegisterInput } from '@/types/user';
+import {
+  AuthUser,
+  UserLoginInput,
+  UserProfile,
+  UserRegisterInput,
+} from '@/types/user';
 import { gql } from '@apollo/client';
 import { TypedDocumentNode as TD } from '@graphql-typed-document-node/core';
 
 // Types for Register mutation
 export interface RegisterMutationData {
-  register: {
-    token: string;
-    user: User;
-  };
+  register: AuthUser;
 }
 
-export const REGISTER: TD<RegisterMutationData, UserRegisterInput> = gql`
-  mutation Register($name: String!, $email: String!, $password: String!) {
-    register(name: $name, email: $email, password: $password) {
-      token
-      user {
+export const REGISTER: TD<RegisterMutationData, { input: UserRegisterInput }> =
+  gql`
+    mutation Register($input: RegisterInput!) {
+      register(input: $input) {
         id
         name
         email
+        imageUrl
       }
     }
-  }
-` as unknown as TD<RegisterMutationData, UserRegisterInput>;
+  ` as unknown as TD<RegisterMutationData, { input: UserRegisterInput }>;
 
 // Types for Login mutation
 export interface LoginMutationData {
-  login: {
-    token: string;
-    user: User;
-  };
+  login: { token: string; user: AuthUser };
 }
 
-export const LOGIN: TD<LoginMutationData, UserLoginInput> = gql`
-  mutation Login($email: String!, $password: String!) {
-    login(email: $email, password: $password) {
+export const LOGIN: TD<LoginMutationData, { input: UserLoginInput }> = gql`
+  mutation Login($input: LoginInput!) {
+    login(input: $input) {
       token
       user {
         id
         name
         email
+        imageUrl
       }
     }
   }
-` as unknown as TD<LoginMutationData, UserLoginInput>;
+` as unknown as TD<LoginMutationData, { input: UserLoginInput }>;
+
+// Update profile
+export interface UpdateMyProfileData {
+  updateMyProfile: UserProfile;
+}
+export interface UpdateMyProfileVars {
+  input: Partial<UserProfile>;
+}
+export const UPDATE_MY_PROFILE: TD<UpdateMyProfileData, UpdateMyProfileVars> =
+  gql`
+    mutation UpdateMyProfile($input: UpdateProfileInput!) {
+      updateMyProfile(input: $input) {
+        id
+        name
+        email
+        imageUrl
+        address
+        dob
+        role
+        createdAt
+        updatedAt
+      }
+    }
+  ` as unknown as TD<UpdateMyProfileData, UpdateMyProfileVars>;
 
 // Types for CreateMeeting mutation
 export interface CreateMeetingMutationData {

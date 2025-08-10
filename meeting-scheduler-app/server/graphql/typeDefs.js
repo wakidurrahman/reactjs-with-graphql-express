@@ -1,10 +1,26 @@
 module.exports = `
   scalar Date
 
+  enum Role {
+    USER
+    ADMIN
+  }
+
+  type AuthUser {
+    id: ID!
+    name: String!
+    email: String!
+    imageUrl: String
+  }
+
   type User {
     id: ID!
     name: String!
     email: String!
+    imageUrl: String
+    address: String
+    dob: String
+    role: Role!
     createdAt: String!
     updatedAt: String!
   }
@@ -23,7 +39,7 @@ module.exports = `
 
   type AuthPayload {
     token: String!
-    user: User!
+    user: AuthUser!
   }
 
   input MeetingInput {
@@ -34,16 +50,37 @@ module.exports = `
     attendeeIds: [ID!]!
   }
 
+  input RegisterInput {
+    name: String!
+    email: String!
+    password: String!
+  }
+
+  input LoginInput {
+    email: String!
+    password: String!
+  }
+
+  input UpdateProfileInput {
+    name: String
+    address: String
+    dob: String
+    imageUrl: String
+  }
+
   type Query {
-    me: User
+    me: AuthUser
+    myProfile: User
+    user(id: ID!): User
     meetings: [Meeting!]!
     meeting(id: ID!): Meeting
     users: [User!]!
   }
 
   type Mutation {
-    register(name: String!, email: String!, password: String!): AuthPayload!
-    login(email: String!, password: String!): AuthPayload!
+    register(input: RegisterInput!): AuthUser!
+    login(input: LoginInput!): AuthPayload!
+    updateMyProfile(input: UpdateProfileInput!): User!
     createMeeting(input: MeetingInput!): Meeting!
     deleteMeeting(id: ID!): Boolean!
   }

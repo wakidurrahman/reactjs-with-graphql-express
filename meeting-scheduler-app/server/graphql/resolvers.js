@@ -7,6 +7,7 @@ const {
   RegisterInputSchema,
   LoginInputSchema,
   MeetingInputSchema,
+  UpdateProfileInputSchema,
 } = require('../utils/validators');
 
 function requireAuth(context) {
@@ -22,19 +23,59 @@ module.exports = {
   // Query resolvers (buildSchema root resolvers: (args, context))
   me: async (_args, context) => {
     const userId = requireAuth(context);
-    const user = await User.findById(userId);
-    return user;
+    const user = await User.findById(userId).lean();
+    if (!user) return null;
+    return {
+      id: String(user._id),
+      name: user.name,
+      email: user.email,
+      imageUrl: user.imageUrl ?? null,
+    };
+  },
+  myProfile: async (_args, context) => {
+    const userId = requireAuth(context);
+    const user = await User.findById(userId).lean();
+    if (!user) return null;
+    return {
+      id: String(user._id),
+      name: user.name,
+      email: user.email,
+      imageUrl: user.imageUrl ?? null,
+      address: user.address ?? '',
+      dob: user.dob ? user.dob.toISOString() : null,
+      role: user.role || 'USER',
+      createdAt: user.createdAt.toISOString(),
+      updatedAt: user.updatedAt.toISOString(),
+    };
   },
   meetings: async (_args, context) => {
     const userId = requireAuth(context);
-    return Meeting.find({ $or: [{ createdBy: userId }, { attendees: userId }] })
+    // 01.The meetings query is scoped to the authenticated user. If you haven’t created any meetings as the current logged-in user (or you created them under another account), the server will legitimately return an empty array.
+    // return Meeting.find({ $or: [{ createdBy: userId }, { attendees: userId }] })
+    // .sort({ startTime: 1 })
+    // .populate('attendees')
+    // .populate('createdBy');
+
+    // 02.If you want to see all meetings (for testing or admin), you can do:
+    return Meeting.find({})
       .sort({ startTime: 1 })
       .populate('attendees')
       .populate('createdBy');
   },
   users: async (_args, context) => {
     requireAuth(context);
-    return User.find({}).sort({ name: 1 });
+    const users = await User.find({}).sort({ name: 1 }).lean();
+    return users.map((u) => ({
+      id: String(u._id),
+      name: u.name,
+      email: u.email,
+      imageUrl: u.imageUrl ?? null,
+      address: u.address ?? '',
+      dob: u.dob ? u.dob.toISOString() : null,
+      role: u.role || 'USER',
+      createdAt: u.createdAt.toISOString(),
+      updatedAt: u.updatedAt.toISOString(),
+    }));
   },
   meeting: async ({ id }, context) => {
     requireAuth(context);
@@ -42,8 +83,9 @@ module.exports = {
   },
 
   // Mutation resolvers
-  register: async ({ name, email, password }, context) => {
-    RegisterInputSchema.parse({ name, email, password });
+  register: async ({ input }, context) => {
+    RegisterInputSchema.parse(input);
+    const { name, email, password } = input;
     const existing = await User.findOne({ email });
     if (existing)
       throw new GraphQLError('Email already in use', {
@@ -51,18 +93,17 @@ module.exports = {
       });
     const hashed = await bcrypt.hash(password, 10);
     const user = await User.create({ name, email, password: hashed });
-    if (!process.env.JWT_SECRET) {
-      throw new GraphQLError('Server misconfiguration: JWT secret missing', {
-        extensions: { code: 'INTERNAL_SERVER_ERROR' },
-      });
-    }
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
-      expiresIn: '7d',
-    });
-    return { token, user };
+    // Return AuthUser projection
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      imageUrl: user.imageUrl ?? null,
+    };
   },
-  login: async ({ email, password }, context) => {
-    LoginInputSchema.parse({ email, password });
+  login: async ({ input }, context) => {
+    LoginInputSchema.parse(input);
+    const { email, password } = input;
     const user = await User.findOne({ email });
     if (!user)
       throw new GraphQLError('Invalid credentials', {
@@ -81,7 +122,37 @@ module.exports = {
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
       expiresIn: '7d',
     });
-    return { token, user };
+    return {
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        imageUrl: user.imageUrl ?? null,
+      },
+    };
+  },
+  updateMyProfile: async ({ input }, context) => {
+    const userId = requireAuth(context);
+    UpdateProfileInputSchema.parse(input);
+    const update = { ...input };
+    if (update.dob) update.dob = new Date(update.dob);
+    const user = await User.findByIdAndUpdate(userId, update, {
+      new: true,
+      runValidators: true,
+    });
+    if (!user) throw new GraphQLError('User not found');
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      imageUrl: user.imageUrl ?? null,
+      address: user.address ?? '',
+      dob: user.dob ? user.dob.toISOString() : null,
+      role: user.role || 'USER',
+      createdAt: user.createdAt.toISOString(),
+      updatedAt: user.updatedAt.toISOString(),
+    };
   },
   createMeeting: async ({ input }, context) => {
     console.log('input', input);
