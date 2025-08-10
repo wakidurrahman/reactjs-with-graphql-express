@@ -6,6 +6,13 @@ import Register from '@/pages/register';
 import React from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
+const pathsLink = {
+  home: '/',
+  createMeeting: '/meetings/new',
+  login: '/login',
+  register: '/register',
+};
+
 /**
  * Private Route
  * Protects the route from unauthorized access
@@ -14,7 +21,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
  */
 function PrivateRoute({ children }: { children: JSX.Element }) {
   const { isAuthenticated } = useAuthContext();
-  return isAuthenticated ? children : <Navigate to="/login" replace />;
+  return isAuthenticated ? children : <Navigate to={pathsLink.login} replace />;
 }
 
 /**
@@ -25,7 +32,7 @@ export default function App(): JSX.Element {
   return (
     <Routes>
       <Route
-        path="/"
+        path={pathsLink.home}
         element={
           <PrivateRoute>
             <Dashboard />
@@ -33,15 +40,15 @@ export default function App(): JSX.Element {
         }
       />
       <Route
-        path="/meetings/new"
+        path={pathsLink.createMeeting}
         element={
           <PrivateRoute>
             <CreateMeeting />
           </PrivateRoute>
         }
       />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+      <Route path={pathsLink.login} element={<Login />} />
+      <Route path={pathsLink.register} element={<Register />} />
     </Routes>
   );
 }

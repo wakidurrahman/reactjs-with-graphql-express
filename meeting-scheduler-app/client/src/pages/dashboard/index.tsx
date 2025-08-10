@@ -1,3 +1,6 @@
+import Button from '@/components/atoms/button';
+import Heading from '@/components/atoms/heading';
+import Spinner from '@/components/atoms/spinner';
 import BaseTemplate from '@/components/templates/base-templates';
 import { useAuthContext } from '@/context/AuthContext';
 import {
@@ -6,34 +9,37 @@ import {
   type MeQueryData,
   type MeetingsQueryData,
 } from '@/graphql/queries';
+import { formatJST } from '@/utils/date';
 import { useQuery } from '@apollo/client';
 import React from 'react';
-import { Link } from 'react-router-dom';
 
 export default function Dashboard(): JSX.Element {
   const { logout } = useAuthContext();
   const { data: meData } = useQuery<MeQueryData>(GET_ME);
   const { data: meetingsData, loading } =
     useQuery<MeetingsQueryData>(GET_MEETINGS);
+  console.log('meetingsData', meetingsData);
+  console.log('loading', loading);
+  console.log('meData', new Date(1754828400000).toLocaleString());
 
   return (
     <BaseTemplate>
       <div className="container">
         <div className="d-flex justify-content-between align-items-center mb-3">
-          <h2>Welcome, {meData?.me?.name || 'User'}</h2>
-          <button className="btn btn-outline-secondary" onClick={logout}>
+          <Heading level={2}>Welcome, {meData?.me?.name || 'User'}</Heading>
+          <Button variant="secondary" outline onClick={logout}>
             Logout
-          </button>
+          </Button>
         </div>
         <div className="d-flex justify-content-end mb-2">
-          <Link className="btn btn-sm btn-primary" to="/meetings/new">
+          <Button variant="primary" size="sm" href="/meetings/new">
             + New meeting
-          </Link>
+          </Button>
         </div>
         <div className="card">
           <div className="card-body">
-            <h5 className="card-title">Your meetings</h5>
-            {loading && <p>Loading...</p>}
+            <Heading level={5}>Your meetings</Heading>
+            {loading && <Spinner />}
             {!loading && (
               <ul className="list-group list-group-flush">
                 {(
@@ -43,8 +49,8 @@ export default function Dashboard(): JSX.Element {
                   <li key={m.id} className="list-group-item">
                     <strong>{m.title}</strong>
                     <div className="small text-muted">
-                      {new Date(m.startTime).toLocaleString()} -{' '}
-                      {new Date(m.endTime).toLocaleString()}
+                      {formatJST(m.startTime, 'yyyy-MM-dd HH:mm')} -{' '}
+                      {formatJST(m.endTime, 'yyyy-MM-dd HH:mm')}
                     </div>
                   </li>
                 ))}

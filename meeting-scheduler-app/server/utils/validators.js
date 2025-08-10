@@ -1,4 +1,5 @@
 const { z } = require('zod');
+const mongoose = require('mongoose');
 
 const RegisterInputSchema = z.object({
   name: z.string().min(2),
@@ -21,7 +22,16 @@ const MeetingInputSchema = z
     endTime: z
       .string()
       .refine((val) => !Number.isNaN(Date.parse(val)), 'Invalid endTime'),
-    attendeeIds: z.array(z.string().min(1)).default([]),
+    attendeeIds: z
+      .array(
+        z
+          .string()
+          .refine(
+            (id) => mongoose.Types.ObjectId.isValid(id),
+            'Invalid attendee id'
+          )
+      )
+      .default([]),
   })
   .refine((data) => new Date(data.startTime) < new Date(data.endTime), {
     message: 'startTime must be before endTime',

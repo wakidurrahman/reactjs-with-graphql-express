@@ -1,22 +1,33 @@
+import Button from '@/components/atoms/button';
+import SelectField from '@/components/atoms/select-field';
+import TextField from '@/components/atoms/text-field';
+import TextareaField from '@/components/atoms/textarea-field';
 import BaseTemplate from '@/components/templates/base-templates';
 import {
   CREATE_MEETING,
   type CreateMeetingMutationData,
   type CreateMeetingMutationVariables,
 } from '@/graphql/mutations';
-import { useMutation } from '@apollo/client';
+import { GET_USERS, type UsersQueryData } from '@/graphql/queries';
+import { useMutation, useQuery } from '@apollo/client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
+
+const isValidObjectId = (value: string): boolean =>
+  /^[0-9a-fA-F]{24}$/.test(value);
 
 const schema = z.object({
   title: z.string().min(1, 'Title is required'),
   description: z.string().optional(),
   startTime: z.string().min(1, 'Start time is required'), // datetime-local string
   endTime: z.string().min(1, 'End time is required'), // datetime-local string
-  attendees: z.string().optional(), // comma-separated IDs
+  attendeeId: z
+    .string()
+    .optional()
+    .refine((val) => !val || isValidObjectId(val), 'Invalid attendee'),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -24,8 +35,14 @@ type FormValues = z.infer<typeof schema>;
 export default function CreateMeeting(): JSX.Element {
   const navigate = useNavigate();
   const {
+    data: usersData,
+    loading: usersLoading,
+    error: usersError,
+  } = useQuery<UsersQueryData>(GET_USERS);
+  const {
     register,
     handleSubmit,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -47,11 +64,7 @@ export default function CreateMeeting(): JSX.Element {
   };
 
   const onSubmit = (values: FormValues) => {
-    const attendeeIds = (values.attendees || '')
-      .split(',')
-      .map((s) => s.trim())
-      .filter(Boolean);
-
+    const attendeeIds = values.attendeeId ? [values.attendeeId] : [];
     return createMeeting({
       variables: {
         input: {
@@ -65,6 +78,13 @@ export default function CreateMeeting(): JSX.Element {
     });
   };
 
+  const userOptions = (usersData?.users ?? []).map((u) => ({
+    value: u.id,
+    label: u.name,
+  }));
+
+  // Attendees are managed by React Hook Form via attendeeId select
+
   return (
     <BaseTemplate>
       <div className="container">
@@ -72,80 +92,88 @@ export default function CreateMeeting(): JSX.Element {
           <div className="col-md-8 col-lg-6">
             <h2 className="mb-3">Create Meeting</h2>
             <form onSubmit={handleSubmit(onSubmit)} noValidate>
-              <div className="mb-3">
-                <label className="form-label">Title</label>
-                <input className="form-control" {...register('title')} />
-                {errors.title && (
-                  <div className="text-danger small">
-                    {errors.title.message}
-                  </div>
-                )}
-              </div>
+              <TextField
+                label="Title"
+                required
+                error={errors.title?.message}
+                {...register('title')}
+              />
 
-              <div className="mb-3">
-                <label className="form-label">Description</label>
-                <textarea
-                  className="form-control"
-                  rows={3}
-                  {...register('description')}
-                />
-              </div>
+              <TextareaField
+                label="Description"
+                rows={3}
+                {...register('description')}
+              />
 
               <div className="row">
-                <div className="col-md-6 mb-3">
-                  <label className="form-label">Start time</label>
-                  <input
+                <div className="col-md-6">
+                  <TextField
                     type="datetime-local"
-                    className="form-control"
+                    label="Start time"
+                    required
+                    error={errors.startTime?.message}
                     {...register('startTime')}
                   />
-                  {errors.startTime && (
-                    <div className="text-danger small">
-                      {errors.startTime.message}
-                    </div>
-                  )}
                 </div>
-                <div className="col-md-6 mb-3">
-                  <label className="form-label">End time</label>
-                  <input
+                <div className="col-md-6">
+                  <TextField
                     type="datetime-local"
-                    className="form-control"
+                    label="End time"
+                    required
+                    error={errors.endTime?.message}
                     {...register('endTime')}
                   />
-                  {errors.endTime && (
-                    <div className="text-danger small">
-                      {errors.endTime.message}
-                    </div>
-                  )}
                 </div>
               </div>
 
-              <div className="mb-3">
-                <label className="form-label">
-                  Attendee IDs (comma-separated)
-                </label>
-                <input className="form-control" {...register('attendees')} />
-              </div>
+              <Controller
+                name="attendeeId"
+                control={control}
+                render={({ field }) => (
+                  <SelectField
+                    label="Attendee (optional)"
+                    error={errors.attendeeId?.message}
+                    disabled={usersLoading}
+                    options={[
+                      {
+                        value: '',
+                        label: usersLoading ? 'Loading…' : 'Select a user',
+                      },
+                      ...userOptions,
+                    ]}
+                    value={field.value ?? ''}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    ref={field.ref}
+                  />
+                )}
+              />
+              {usersError && (
+                <div className="text-danger small mt-2">
+                  Failed to load users
+                </div>
+              )}
 
               {error && (
                 <div className="alert alert-danger">{error.message}</div>
               )}
 
               <div className="d-flex gap-2">
-                <button
-                  className="btn btn-primary"
+                <Button
                   type="submit"
+                  variant="primary"
                   disabled={loading || isSubmitting}
                 >
                   Create
-                </button>
-                <button
-                  className="btn btn-outline-secondary"
+                </Button>
+                <Button
                   type="button"
+                  variant="secondary"
+                  outline
                   onClick={() => navigate(-1)}
                 >
                   Cancel
-                </button>
+                </Button>
               </div>
             </form>
           </div>

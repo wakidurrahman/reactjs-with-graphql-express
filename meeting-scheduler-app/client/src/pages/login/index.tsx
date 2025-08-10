@@ -1,3 +1,5 @@
+import Button from '@/components/atoms/button';
+import TextField from '@/components/atoms/text-field';
 import BaseTemplate from '@/components/templates/base-templates';
 import { useAuthContext } from '@/context/AuthContext';
 import { LOGIN, type LoginMutationData } from '@/graphql/mutations';
@@ -54,42 +56,30 @@ export default function Login(): JSX.Element {
           <div className="col-md-6">
             <h2 className="mb-3">Login</h2>
             <form onSubmit={handleSubmit(onSubmit)} noValidate>
-              <div className="mb-3">
-                <label className="form-label">Email</label>
-                <input
-                  type="email"
-                  className="form-control"
-                  {...register('email')}
-                />
-                {errors.email && (
-                  <div className="text-danger small">
-                    {errors.email.message}
-                  </div>
-                )}
-              </div>
-              <div className="mb-3">
-                <label className="form-label">Password</label>
-                <input
-                  type="password"
-                  className="form-control"
-                  {...register('password')}
-                />
-                {errors.password && (
-                  <div className="text-danger small">
-                    {errors.password.message}
-                  </div>
-                )}
-              </div>
+              <TextField
+                type="email"
+                label="Email"
+                required
+                error={errors.email?.message}
+                {...register('email')}
+              />
+              <TextField
+                type="password"
+                label="Password"
+                required
+                error={errors.password?.message}
+                {...register('password')}
+              />
               {error && (
                 <div className="alert alert-danger">{error.message}</div>
               )}
-              <button
-                className="btn btn-primary"
+              <Button
                 type="submit"
+                variant="primary"
                 disabled={loading || isSubmitting}
               >
                 Login
-              </button>
+              </Button>
             </form>
             {process.env.NODE_ENV !== 'production' && (
               <DevTool control={control} />

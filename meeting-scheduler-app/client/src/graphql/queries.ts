@@ -44,3 +44,18 @@ export const GET_MEETINGS: TD<MeetingsQueryData, Record<string, never>> = gql`
     }
   }
 ` as unknown as TD<MeetingsQueryData, Record<string, never>>;
+
+// Types for Users query
+export interface UsersQueryData {
+  users: Array<User>;
+}
+
+export const GET_USERS: TD<UsersQueryData, Record<string, never>> = gql`
+  query Users {
+    users {
+      id
+      name
+      email
+    }
+  }
+` as unknown as TD<UsersQueryData, Record<string, never>>;

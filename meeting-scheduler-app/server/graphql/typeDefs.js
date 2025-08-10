@@ -38,6 +38,7 @@ module.exports = `
     me: User
     meetings: [Meeting!]!
     meeting(id: ID!): Meeting
+    users: [User!]!
   }
 
   type Mutation {

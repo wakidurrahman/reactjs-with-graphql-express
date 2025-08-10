@@ -32,6 +32,10 @@ module.exports = {
       .populate('attendees')
       .populate('createdBy');
   },
+  users: async (_args, context) => {
+    requireAuth(context);
+    return User.find({}).sort({ name: 1 });
+  },
   meeting: async ({ id }, context) => {
     requireAuth(context);
     return Meeting.findById(id).populate('attendees').populate('createdBy');
@@ -80,9 +84,21 @@ module.exports = {
     return { token, user };
   },
   createMeeting: async ({ input }, context) => {
+    console.log('input', input);
     const userId = requireAuth(context);
-    const { title, description, startTime, endTime, attendeeIds } =
-      MeetingInputSchema.parse(input);
+    let parsed;
+    try {
+      parsed = MeetingInputSchema.parse(input);
+    } catch (err) {
+      throw new GraphQLError('Invalid meeting input', {
+        extensions: {
+          code: 'BAD_USER_INPUT',
+          details: err?.errors ?? undefined,
+        },
+      });
+    }
+    const { title, description, startTime, endTime, attendeeIds } = parsed;
+    // Ensure attendees are ObjectIds to avoid cast errors surfacing as 500s
     const meeting = await Meeting.create({
       title,
       description,

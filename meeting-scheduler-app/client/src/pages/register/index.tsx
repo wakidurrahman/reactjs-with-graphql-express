@@ -1,3 +1,5 @@
+import Button from '@/components/atoms/button';
+import TextField from '@/components/atoms/text-field';
 import BaseTemplate from '@/components/templates/base-templates';
 import { useAuthContext } from '@/context/AuthContext';
 import { REGISTER, type RegisterMutationData } from '@/graphql/mutations';
@@ -55,49 +57,36 @@ export default function Register(): JSX.Element {
           <div className="col-md-6">
             <h2 className="mb-3">Register</h2>
             <form onSubmit={handleSubmit(onSubmit)} noValidate>
-              <div className="mb-3">
-                <label className="form-label">Name</label>
-                <input className="form-control" {...register('name')} />
-                {errors.name && (
-                  <div className="text-danger small">{errors.name.message}</div>
-                )}
-              </div>
-              <div className="mb-3">
-                <label className="form-label">Email</label>
-                <input
-                  type="email"
-                  className="form-control"
-                  {...register('email')}
-                />
-                {errors.email && (
-                  <div className="text-danger small">
-                    {errors.email.message}
-                  </div>
-                )}
-              </div>
-              <div className="mb-3">
-                <label className="form-label">Password</label>
-                <input
-                  type="password"
-                  className="form-control"
-                  {...register('password')}
-                />
-                {errors.password && (
-                  <div className="text-danger small">
-                    {errors.password.message}
-                  </div>
-                )}
-              </div>
+              <TextField
+                label="Name"
+                required
+                error={errors.name?.message}
+                {...register('name')}
+              />
+              <TextField
+                type="email"
+                label="Email"
+                required
+                error={errors.email?.message}
+                {...register('email')}
+              />
+              <TextField
+                type="password"
+                label="Password"
+                required
+                error={errors.password?.message}
+                {...register('password')}
+              />
               {error && (
                 <div className="alert alert-danger">{error.message}</div>
               )}
-              <button
-                className="btn btn-primary"
+              <Button
                 type="submit"
+                variant="primary"
                 disabled={loading || isSubmitting}
               >
                 Create account
-              </button>
+              </Button>
             </form>
             {process.env.NODE_ENV !== 'production' && (
               <DevTool control={control} />
