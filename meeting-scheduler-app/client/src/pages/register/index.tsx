@@ -3,6 +3,7 @@ import TextField from '@/components/atoms/text-field';
 import BaseTemplate from '@/components/templates/base-templates';
 import { REGISTER, type RegisterMutationData } from '@/graphql/mutations';
 import type { UserRegisterInput } from '@/types/user';
+import { registerSchema } from '@/utils/validation';
 import { useMutation } from '@apollo/client';
 import { DevTool } from '@hookform/devtools';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -14,13 +15,7 @@ import { z } from 'zod';
 export default function Register(): JSX.Element {
   const navigate = useNavigate();
 
-  const schema = z.object({
-    name: z.string().min(2, 'Name is too short'),
-    email: z.string().email('Invalid email'),
-    password: z.string().min(6, 'Password must be at least 6 characters'),
-  });
-
-  type FormValues = z.infer<typeof schema>;
+  type FormValues = z.infer<typeof registerSchema>;
 
   const {
     register,
@@ -28,7 +23,7 @@ export default function Register(): JSX.Element {
     control,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(registerSchema),
     mode: 'onChange',
     criteriaMode: 'all',
     shouldFocusError: true,
